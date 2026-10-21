@@ -1,0 +1,450 @@
+{
+  "info": {
+    "name": "Task Management API",
+    "_postman_id": "task-management-api-collection",
+    "description": "Complete CRUD API for Task Management with search, filter, and pagination",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "taskId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Check if the server is running"
+      },
+      "response": []
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "  pm.collectionVariables.set('taskId', res.data._id);",
+                  "  console.log('taskId saved:', res.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Buy groceries\",\n  \"description\": \"Milk, eggs, bread, butter\",\n  \"category\": \"personal\",\n  \"status\": \"pending\",\n  \"priority\": \"high\",\n  \"dueDate\": \"2026-10-30\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Create a new task. taskId is auto-saved to collection variable."
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Create Tasks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tasks\": [\n    {\n      \"title\": \"Team meeting\",\n      \"description\": \"Weekly sync with the team\",\n      \"category\": \"work\",\n      \"status\": \"pending\",\n      \"priority\": \"high\",\n      \"dueDate\": \"2026-10-25\"\n    },\n    {\n      \"title\": \"Fix login bug\",\n      \"description\": \"Resolve the JWT expiry issue\",\n      \"category\": \"work\",\n      \"status\": \"in-progress\",\n      \"priority\": \"high\",\n      \"dueDate\": \"2026-10-22\"\n    },\n    {\n      \"title\": \"Read a book\",\n      \"description\": \"Finish Atomic Habits\",\n      \"category\": \"personal\",\n      \"status\": \"pending\",\n      \"priority\": \"low\",\n      \"dueDate\": \"2026-10-31\"\n    },\n    {\n      \"title\": \"Gym workout\",\n      \"description\": \"Leg day session\",\n      \"category\": \"health\",\n      \"status\": \"pending\",\n      \"priority\": \"medium\",\n      \"dueDate\": \"2026-10-23\"\n    },\n    {\n      \"title\": \"Pay electricity bill\",\n      \"description\": \"Due before month end\",\n      \"category\": \"personal\",\n      \"status\": \"pending\",\n      \"priority\": \"high\",\n      \"dueDate\": \"2026-10-28\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "bulk"]
+            },
+            "description": "Insert multiple tasks at once. Max 100 tasks per request. Duplicate titles are skipped with error info returned."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Get all tasks without any filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Search by Title",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?search=groceries",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "groceries",
+                  "description": "Search tasks by title (case-insensitive)"
+                }
+              ]
+            },
+            "description": "Search tasks by title using regex match"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Filter by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?category=personal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "personal",
+                  "description": "Filter by category"
+                }
+              ]
+            },
+            "description": "Filter tasks by category"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Filter by Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "pending | in-progress | completed"
+                }
+              ]
+            },
+            "description": "Filter tasks by status: pending | in-progress | completed"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Filter by Priority",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?priority=high",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "priority",
+                  "value": "high",
+                  "description": "low | medium | high"
+                }
+              ]
+            },
+            "description": "Filter tasks by priority: low | medium | high"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Pagination",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "5",
+                  "description": "Items per page (default: 10)"
+                }
+              ]
+            },
+            "description": "Paginate tasks — page & limit"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Sort by Oldest",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?sortBy=oldest",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "sortBy",
+                  "value": "oldest",
+                  "description": "recent | oldest (default: recent)"
+                }
+              ]
+            },
+            "description": "Sort tasks by oldest first"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - No Pagination",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?isPagination=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "isPagination",
+                  "value": "false",
+                  "description": "Pass false to get all tasks without pagination"
+                }
+              ]
+            },
+            "description": "Fetch all tasks in one go without pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - All Filters Combined",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?search=buy&category=personal&status=pending&priority=high&page=1&limit=5&sortBy=recent",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                { "key": "search", "value": "buy", "description": "Search by title" },
+                { "key": "category", "value": "personal", "description": "Filter by category" },
+                { "key": "status", "value": "pending", "description": "pending | in-progress | completed" },
+                { "key": "priority", "value": "high", "description": "low | medium | high" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" },
+                { "key": "sortBy", "value": "recent", "description": "recent | oldest" }
+              ]
+            },
+            "description": "Use all query params together — search + category + status + priority + pagination + sort"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Filter by fromDate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?fromDate=2026-10-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2026-10-01",
+                  "description": "Filter tasks with dueDate >= fromDate (YYYY-MM-DD)"
+                }
+              ]
+            },
+            "description": "Get tasks where dueDate is on or after fromDate"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Filter by toDate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?toDate=2026-10-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "toDate",
+                  "value": "2026-10-31",
+                  "description": "Filter tasks with dueDate <= toDate (YYYY-MM-DD)"
+                }
+              ]
+            },
+            "description": "Get tasks where dueDate is on or before toDate"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - Filter by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?fromDate=2026-10-01&toDate=2026-10-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2026-10-01",
+                  "description": "Start date (YYYY-MM-DD)"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2026-10-31",
+                  "description": "End date (YYYY-MM-DD)"
+                }
+              ]
+            },
+            "description": "Get tasks within a dueDate range — fromDate to toDate"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks - All Filters + Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?search=buy&category=personal&status=pending&priority=high&fromDate=2026-10-01&toDate=2026-10-31&page=1&limit=5&sortBy=recent",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                { "key": "search", "value": "buy" },
+                { "key": "category", "value": "personal" },
+                { "key": "status", "value": "pending" },
+                { "key": "priority", "value": "high" },
+                { "key": "fromDate", "value": "2026-10-01", "description": "Start date (YYYY-MM-DD)" },
+                { "key": "toDate", "value": "2026-10-31", "description": "End date (YYYY-MM-DD)" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" },
+                { "key": "sortBy", "value": "recent" }
+              ]
+            },
+            "description": "All filters combined including date range"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}"]
+            },
+            "description": "Get a single task by MongoDB _id. taskId is auto-set after Create Task."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in-progress\",\n  \"priority\": \"medium\",\n  \"description\": \"Updated description here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}"]
+            },
+            "description": "Update any fields of a task by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}"]
+            },
+            "description": "Delete a task by ID"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
