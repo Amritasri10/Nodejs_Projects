@@ -1,0 +1,23 @@
+{
+  "name": "expense-tracker-api",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Expense Tracker REST API with JWT Auth, transactions, summary and reports",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.2",
+    "nodemon": "^3.1.11"
+  }
+}
