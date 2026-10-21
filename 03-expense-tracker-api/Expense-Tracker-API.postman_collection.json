@@ -1,0 +1,484 @@
+{
+  "info": {
+    "name": "Expense Tracker API",
+    "_postman_id": "expense-tracker-api-collection",
+    "description": "Complete Expense Tracker API with JWT Auth, Transactions CRUD, and Summary Reports",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5002",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token – auto-saved after login or register"
+    },
+    {
+      "key": "transactionId",
+      "value": "",
+      "type": "string",
+      "description": "Transaction _id – auto-saved after Create Transaction"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Check if the server is running"
+      },
+      "response": []
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.user && res.data.user.token) {",
+                  "  pm.collectionVariables.set('token', res.data.user.token);",
+                  "  console.log('Token saved:', res.data.user.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Amrita Srivastava\",\n  \"email\": \"amrita@example.com\",\n  \"password\": \"amrita123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user. Token is auto-saved."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.user && res.data.user.token) {",
+                  "  pm.collectionVariables.set('token', res.data.user.token);",
+                  "  console.log('Token saved:', res.data.user.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"amrita@example.com\",\n  \"password\": \"amrita123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login user. Token is auto-saved."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Get logged-in user profile."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Create Transaction - Expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "  pm.collectionVariables.set('transactionId', res.data._id);",
+                  "  console.log('transactionId saved:', res.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"expense\",\n  \"amount\": 500,\n  \"category\": \"Food\",\n  \"description\": \"Lunch at restaurant\",\n  \"date\": \"2026-10-21\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"]
+            },
+            "description": "Add an expense transaction. transactionId is auto-saved."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Income",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"income\",\n  \"amount\": 50000,\n  \"category\": \"Salary\",\n  \"description\": \"October salary\",\n  \"date\": \"2026-10-01\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"]
+            },
+            "description": "Add an income transaction."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"]
+            },
+            "description": "Get all transactions of the logged-in user."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Transactions - Filter by Type (expense)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions?type=expense",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"],
+              "query": [
+                { "key": "type", "value": "expense", "description": "income | expense" }
+              ]
+            },
+            "description": "Filter transactions by type"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Transactions - Filter by Category",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions?category=Food",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"],
+              "query": [
+                { "key": "category", "value": "Food", "description": "Filter by category" }
+              ]
+            },
+            "description": "Filter transactions by category"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Transactions - Search",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions?search=salary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"],
+              "query": [
+                { "key": "search", "value": "salary", "description": "Search by description or category" }
+              ]
+            },
+            "description": "Search transactions by description or category"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Transactions - Date Range",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions?fromDate=2026-10-01&toDate=2026-10-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"],
+              "query": [
+                { "key": "fromDate", "value": "2026-10-01", "description": "Start date YYYY-MM-DD" },
+                { "key": "toDate",   "value": "2026-10-31", "description": "End date YYYY-MM-DD" }
+              ]
+            },
+            "description": "Filter transactions by date range"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Transactions - Pagination",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions?page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"],
+              "query": [
+                { "key": "page",  "value": "1" },
+                { "key": "limit", "value": "5" }
+              ]
+            },
+            "description": "Paginate transactions"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Transactions - Sort by Oldest",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions?sortBy=oldest",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"],
+              "query": [
+                { "key": "sortBy", "value": "oldest", "description": "recent | oldest" }
+              ]
+            },
+            "description": "Sort transactions oldest first"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Transactions - All Filters Combined",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions?type=expense&category=Food&search=lunch&fromDate=2026-10-01&toDate=2026-10-31&page=1&limit=5&sortBy=recent",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"],
+              "query": [
+                { "key": "type",     "value": "expense" },
+                { "key": "category", "value": "Food" },
+                { "key": "search",   "value": "lunch" },
+                { "key": "fromDate", "value": "2026-10-01" },
+                { "key": "toDate",   "value": "2026-10-31" },
+                { "key": "page",     "value": "1" },
+                { "key": "limit",    "value": "5" },
+                { "key": "sortBy",   "value": "recent" }
+              ]
+            },
+            "description": "All filters combined"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/{{transactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions", "{{transactionId}}"]
+            },
+            "description": "Get a single transaction. transactionId is auto-set after Create."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 650,\n  \"description\": \"Dinner at restaurant\",\n  \"category\": \"Food\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/{{transactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions", "{{transactionId}}"]
+            },
+            "description": "Update any fields of a transaction."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/{{transactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions", "{{transactionId}}"]
+            },
+            "description": "Delete a transaction by ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Summary",
+      "item": [
+        {
+          "name": "Overall Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "summary"]
+            },
+            "description": "Get total income, total expense, balance and transaction counts."
+          },
+          "response": []
+        },
+        {
+          "name": "Category Wise Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/summary/category",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "summary", "category"]
+            },
+            "description": "Get breakdown of all transactions grouped by category."
+          },
+          "response": []
+        },
+        {
+          "name": "Category Wise Summary - Expense Only",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/summary/category?type=expense",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "summary", "category"],
+              "query": [
+                { "key": "type", "value": "expense", "description": "income | expense" }
+              ]
+            },
+            "description": "Get category breakdown for expenses only."
+          },
+          "response": []
+        },
+        {
+          "name": "Category Wise Summary - Income Only",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/summary/category?type=income",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "summary", "category"],
+              "query": [
+                { "key": "type", "value": "income", "description": "income | expense" }
+              ]
+            },
+            "description": "Get category breakdown for income only."
+          },
+          "response": []
+        },
+        {
+          "name": "Monthly Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/summary/monthly",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "summary", "monthly"]
+            },
+            "description": "Get month-wise income, expense and balance for current year."
+          },
+          "response": []
+        },
+        {
+          "name": "Monthly Summary - Specific Year",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/summary/monthly?year=2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "summary", "monthly"],
+              "query": [
+                { "key": "year", "value": "2026", "description": "Any year e.g. 2025, 2026" }
+              ]
+            },
+            "description": "Get monthly summary for a specific year."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
